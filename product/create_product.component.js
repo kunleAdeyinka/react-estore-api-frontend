@@ -1,0 +1,145 @@
+window.CreateProductComponent = React.createClass({
+    // initial state values
+    getInitialState(){
+      return{
+        categories: [],
+        selectedCategoryId: -1,
+        name: '',
+        description: '',
+        price: '',
+        successCreation: null
+      };
+    },
+
+    //on mount get all the categories and store them in the component's state
+    componentDidMount(){
+      this.serverRequest = $.get("http://localhost/estoreapi/category/read.php", function(categories){
+        this.setState({categories: categories.records});
+      }.bind(this));
+
+      $('.page-header h1').text('Create product');
+    },
+
+    //on unmount don't get the categories in case the request is still loading
+    componentWillUnmount(){
+      this.serverRequest.abort();
+    },
+
+    //handle category change
+    onCategoryChange(e){
+      this.setState({selectedCategoryId: e.target.value});
+    },
+
+    //handle name change
+    onNameChange(e){
+      this.setState({name: e.target.value});
+    },
+
+    // handle description change
+    onDescriptionChange: function(e) {
+        this.setState({description: e.target.value});
+    },
+
+    // handle price change
+    onPriceChange: function(e) {
+        this.setState({price: e.target.value});
+    },
+
+    // handle save button clicked
+    onSave: function(e){
+      //get form data
+      var form_data = {
+        name: this.state.name,
+        description: this.state.description,
+        price: this.state.price,
+        category_id: this.state.selectedCategoryId
+      };
+
+      //submit the form data to api
+      $.ajax({
+        url: "http://localhost/estoreapi/product/create.php",
+        type : "POST",
+        contentType : 'application/json',
+        data : JSON.stringify(form_data),
+        success: function(response){
+          this.setState({successCreation: response['message']});
+
+          // empty the form
+          this.setState({name: ""});
+          this.setState({description: ""});
+          this.setState({price: ""});
+          this.setState({selectedCategoryId: -1});
+        }.bind(this),
+        error(xhr, resp, text){
+          console.log(xhr, resp, text);
+        }
+      });
+
+      e.preventDefault();
+    },
+
+    //render the create product form
+    render(){
+      // make categories as option for the select tag.
+      var categoriesOptions = this.state.categories.map(function(category){
+        return (<option key={category.id} value={category.id}>{category.name}</option>);
+      });
+
+      return (
+        <div>
+          {
+            this.state.successCreation == "Product was created." ? <div className='alert alert-success'>Product was saved.</div> : null
+          }
+          {
+            this.state.successCreation == "Unable to create product." ? <div className='alert alert-danger'>Unable to save product. Please try again.</div> : null
+          }
+          <a href='#' onClick={() => this.props.changeAppMode('read')} className='btn btn-primary margin-bottom-1em'>
+            Read Products
+          </a>
+
+          <form onSubmit={this.onSave}>
+            <table className='table table-bordered table-hover'>
+              <tbody>
+                <tr>
+                  <td>Name</td>
+                  <td>
+                    <input type='text' className='form-control' value={this.state.name} required onChange={this.onNameChange} />
+                  </td>
+                </tr>
+                <tr>
+                  <td>Description</td>
+                  <td>
+                    <textarea type='text' className='form-control' required value={this.state.description} onChange={this.onDescriptionChange}>
+                    </textarea>
+                  </td>
+                </tr>
+                <tr>
+                  <td>Price ($)</td>
+                  <td>
+                    <input type='number' step="0.01" className='form-control' value={this.state.price} required onChange={this.onPriceChange}/>
+                  </td>
+                </tr>
+                <tr>
+                  <td>Category</td>
+                  <td>
+                    <select onChange={this.onCategoryChange} className='form-control' value={this.state.selectedCategoryId}>
+                      <option value="-1">Select category...</option>
+                      {categoriesOptions}
+                    </select>
+                  </td>
+                </tr>
+                <tr>
+                  <td></td>
+                  <td>
+                    <button className='btn btn-primary' onClick={this.onSave}>Save</button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </form>
+        </div>
+      );
+
+
+    }
+  });

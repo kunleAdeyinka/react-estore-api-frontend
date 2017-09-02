@@ -14,7 +14,7 @@ window.ProductsTable = React.createClass({
                     <th>Description</th>
                     <th>Price</th>
                     <th>Category</th>
-                    <th>Action</th>
+                    <th className="adjustActionColumn">Action</th>
                   </tr>
               </thead>
               <tbody>

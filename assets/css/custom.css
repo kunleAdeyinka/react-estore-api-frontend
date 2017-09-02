@@ -1,15 +1,22 @@
-.text-align-center{ 
-text-align:center; 
+table {
+    table-layout: fixed;
+    word-wrap: break-word;
 }
-.margin-zero{ 
-margin:0; 
+.text-align-center{
+text-align:center;
 }
-.overflow-hidden{ 
-overflow:hidden; 
+.margin-zero{
+margin:0;
 }
-.margin-bottom-1em{ 
-margin-bottom:1em; 
+.overflow-hidden{
+overflow:hidden;
+}
+.margin-bottom-1em{
+margin-bottom:1em;
 }
 .m-r-1em{
- margin-right:1em; 
+ margin-right:1em;
+ }
+ .adjustActionColumn{
+   width:23%;
  }
